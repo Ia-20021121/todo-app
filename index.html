@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ToDo App</title>
+<style>
+  :root{
+    --bg:#0f1220;
+    --panel:#191d33;
+    --panel-2:#222748;
+    --border:#2e3559;
+    --text:#e8eaf6;
+    --muted:#9aa3c7;
+    --accent:#7c8cff;
+    --accent-2:#5e6df0;
+    --danger:#ff6b81;
+    --done:#5f6a99;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{
+    font-family:'Segoe UI','Hiragino Kaku Gothic ProN','Noto Sans JP',system-ui,sans-serif;
+    background:radial-gradient(1000px 600px at 80% -10%,rgba(124,140,255,.18),transparent 60%),var(--bg);
+    color:var(--text);
+    min-height:100vh;
+    display:flex;
+    justify-content:center;
+    align-items:flex-start;
+    padding:48px 16px;
+  }
+  .app{
+    width:100%;
+    max-width:520px;
+    background:var(--panel);
+    border:1px solid var(--border);
+    border-radius:18px;
+    padding:28px;
+    box-shadow:0 20px 60px rgba(0,0,0,.35);
+  }
+  h1{
+    font-size:1.7rem;
+    font-weight:700;
+    letter-spacing:-.01em;
+    margin-bottom:4px;
+  }
+  .subtitle{color:var(--muted);font-size:.9rem;margin-bottom:22px}
+
+  .input-row{display:flex;gap:10px;margin-bottom:20px}
+  #task-input{
+    flex:1;
+    background:var(--panel-2);
+    border:1px solid var(--border);
+    border-radius:11px;
+    padding:12px 14px;
+    color:var(--text);
+    font-size:1rem;
+    outline:none;
+    transition:border-color .15s;
+  }
+  #task-input:focus{border-color:var(--accent)}
+  #task-input::placeholder{color:var(--muted)}
+  .btn{
+    border:none;
+    border-radius:11px;
+    cursor:pointer;
+    font-size:.95rem;
+    font-weight:600;
+    transition:transform .08s,opacity .15s;
+  }
+  .btn:active{transform:scale(.96)}
+  #add-btn{
+    background:linear-gradient(135deg,var(--accent),var(--accent-2));
+    color:#fff;
+    padding:12px 20px;
+  }
+  #add-btn:hover{opacity:.92}
+
+  ul{list-style:none}
+  .task{
+    display:flex;
+    align-items:center;
+    gap:12px;
+    background:var(--panel-2);
+    border:1px solid var(--border);
+    border-radius:12px;
+    padding:12px 14px;
+    margin-bottom:10px;
+    animation:pop .18s ease;
+  }
+  @keyframes pop{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:none}}
+  .task input[type=checkbox]{
+    width:20px;height:20px;
+    accent-color:var(--accent);
+    cursor:pointer;
+    flex:0 0 auto;
+  }
+  .task .label{
+    flex:1;
+    font-size:1rem;
+    word-break:break-word;
+  }
+  .task.done .label{
+    text-decoration:line-through;
+    color:var(--done);
+  }
+  .del-btn{
+    background:transparent;
+    color:var(--danger);
+    border:1px solid transparent;
+    padding:6px 12px;
+  }
+  .del-btn:hover{border-color:var(--danger);background:rgba(255,107,129,.1)}
+
+  .empty{
+    text-align:center;
+    color:var(--muted);
+    font-size:.9rem;
+    padding:24px 0;
+  }
+</style>
+</head>
+<body>
+  <div class="app">
+    <h1>ToDo App</h1>
+    <p class="subtitle">タスクを追加して、終わったらチェック。</p>
+
+    <div class="input-row">
+      <input type="text" id="task-input" placeholder="やることを入力..." autocomplete="off">
+      <button class="btn" id="add-btn">追加</button>
+    </div>
+
+    <ul id="task-list"></ul>
+    <p class="empty" id="empty-msg">まだタスクはありません。</p>
+  </div>
+
+<script>
+  const input = document.getElementById('task-input');
+  const addBtn = document.getElementById('add-btn');
+  const list = document.getElementById('task-list');
+  const emptyMsg = document.getElementById('empty-msg');
+
+  function updateEmpty(){
+    emptyMsg.style.display = list.children.length === 0 ? 'block' : 'none';
+  }
+
+  function addTask(){
+    const text = input.value.trim();
+    if(!text) return;
+
+    const li = document.createElement('li');
+    li.className = 'task';
+
+    const checkbox = document.createElement('input');
+    checkbox.type = 'checkbox';
+    checkbox.addEventListener('change', () => {
+      li.classList.toggle('done', checkbox.checked);
+    });
+
+    const label = document.createElement('span');
+    label.className = 'label';
+    label.textContent = text;
+
+    const delBtn = document.createElement('button');
+    delBtn.className = 'btn del-btn';
+    delBtn.textContent = '削除';
+    delBtn.addEventListener('click', () => {
+      li.remove();
+      updateEmpty();
+    });
+
+    li.append(checkbox, label, delBtn);
+    list.appendChild(li);
+
+    input.value = '';
+    input.focus();
+    updateEmpty();
+  }
+
+  addBtn.addEventListener('click', addTask);
+  input.addEventListener('keydown', (e) => {
+    if(e.key === 'Enter') addTask();
+  });
+
+  updateEmpty();
+</script>
+</body>
+</html>
